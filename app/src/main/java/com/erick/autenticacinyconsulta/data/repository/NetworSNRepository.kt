@@ -1,10 +1,12 @@
 package com.erick.autenticacinyconsulta.data.repository
 
 import android.util.Log
+import com.erick.autenticacinyconsulta.data.model.AlumnoPerfil
 import com.erick.autenticacinyconsulta.data.model.LoginResult
 import com.erick.autenticacinyconsulta.data.remote.SICENETWService
 import com.erick.autenticacinyconsulta.data.remote.SoapRequestBuilder
 import com.erick.autenticacinyconsulta.data.repository.SNRepository
+import com.google.gson.Gson
 
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -43,18 +45,26 @@ class NetworSNRepository(
             )
         }
     }
-    override suspend fun obtenerPerfil(): String {
+    override suspend fun obtenerPerfil(): AlumnoPerfil {
 
         val body = SoapRequestBuilder.perfil()
             .toRequestBody("text/xml; charset=utf-8".toMediaType())
 
         val response = snApiService.getAlumnoAcademico(body)
-
         val xml = response.string()
 
         Log.d("SICENET_PERFIL_XML", xml)
 
-        return xml
+        val json = extraerJson(xml)
+
+        Log.d("SICENET_PERFIL_JSON", json)
+
+        return Gson().fromJson(json, AlumnoPerfil::class.java)
+    }
+
+    private fun extraerJson(xml: String): String {
+        return xml.substringAfter("<getAlumnoAcademicoResult>")
+            .substringBefore("</getAlumnoAcademicoResult>")
     }
 
 }
