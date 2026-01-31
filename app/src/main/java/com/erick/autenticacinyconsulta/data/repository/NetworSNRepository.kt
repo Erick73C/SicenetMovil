@@ -43,4 +43,18 @@ class NetworSNRepository(
             )
         }
     }
+    override suspend fun obtenerPerfil(): String {
+
+        val body = SoapRequestBuilder.perfil()
+            .toRequestBody("text/xml; charset=utf-8".toMediaType())
+
+        val response = snApiService.getAlumnoAcademico(body)
+
+        val xml = response.string()
+
+        Log.d("SICENET_PERFIL_XML", xml)
+
+        return xml
+    }
+
 }
