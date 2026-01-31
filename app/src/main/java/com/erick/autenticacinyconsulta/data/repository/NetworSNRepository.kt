@@ -27,7 +27,9 @@ class NetworSNRepository(
         Log.d("SICENET_XML", xml)
 
         val accesoCorrecto =
-            xml.contains("<accesoLoginResult>true</accesoLoginResult>")
+            xml.contains("\"acceso\":true")
+
+        Log.d("SICENET_LOGIN", "Acceso correcto = $accesoCorrecto")
 
         return if (accesoCorrecto) {
             LoginResult(
