@@ -1,3 +1,7 @@
 package com.erick.autenticacinyconsulta.data.model
 
-//data class LoginResult()
+data class LoginResult(
+    val success: Boolean,
+    val cookie: String? = null,
+    val message: String? = null
+)

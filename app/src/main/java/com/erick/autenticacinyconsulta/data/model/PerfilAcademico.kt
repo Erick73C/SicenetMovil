@@ -1,3 +1,9 @@
 package com.erick.autenticacinyconsulta.data.model
 
-//data class PerfilAcademico()
+data class PerfilAcademico(
+    val nombre: String,
+    val matricula: String,
+    val carrera: String,
+    val semestre: String,
+    val promedio: String
+)
