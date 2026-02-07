@@ -28,23 +28,26 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        val appContainer =
+            (application as SicenetApp).container
 
         setContent {
             AutenticaciónYConsultaTheme {
 
                 var pantallaActual by remember { mutableStateOf("login") }
-                val appContainer = DefaultAppContainer(applicationContext)
+
                 when (pantallaActual) {
+
                     "login" -> {
                         LoginScreen(
                             onLoginSuccess = { pantallaActual = "perfil" },
-                            snRepository = appContainer.snRepository
+                            snRepository = appContainer.networkSNRepository
                         )
                     }
 
                     "perfil" -> {
                         PerfilScreen(
-                            snRepository = appContainer.snRepository
+                            snRepository = appContainer.networkSNRepository
                         )
                     }
                 }
