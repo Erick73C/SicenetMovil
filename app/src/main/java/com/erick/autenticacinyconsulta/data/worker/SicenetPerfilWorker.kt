@@ -4,28 +4,32 @@ import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import androidx.work.Data
 import com.erick.autenticacinyconsulta.data.repository.SNRepository
 
-class SicenetPerfilWorker(
+    class SicenetPerfilWorker(
     context: Context,
     params: WorkerParameters,
-    private val repository: SNRepository
+    private val networkRepository: SNRepository
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-
-        Log.d("WM_PERFIL", "🚀 Worker iniciado")
-
         return try {
-            val perfil = repository.obtenerPerfil()
+            Log.d("WM_PERFIL", "Worker 1 iniciado")
 
-            Log.d("WM_PERFIL", "✅ Perfil obtenido: $perfil")
+            val perfilJson = networkRepository.obtenerPerfilJson()
 
-            Result.success()
+            Log.d("WM_PERFIL", "Perfil recibido: $perfilJson")
+
+            val output = Data.Builder()
+                .putString("perfil_json", perfilJson)
+                .build()
+
+            Result.success(output)
 
         } catch (e: Exception) {
-            Log.e("WM_PERFIL", "❌ Error en worker", e)
-            Result.retry()
+            Log.e("WM_PERFIL", "Error en Worker 1", e)
+            Result.failure()
         }
     }
 }

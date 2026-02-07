@@ -6,7 +6,6 @@ import com.erick.autenticacinyconsulta.data.model.LoginResult
 interface SNRepository {
 
     suspend fun acceso(matricula: String, password: String): LoginResult
-
-    suspend fun obtenerPerfil(): AlumnoPerfil?
-
+    suspend fun obtenerPerfil(): AlumnoPerfil
+    suspend fun obtenerPerfilJson(): String
 }

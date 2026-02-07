@@ -1,11 +1,11 @@
 package com.erick.autenticacinyconsulta.data.worker
 
 import android.content.Context
-import androidx.work.Worker
+import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.erick.autenticacinyconsulta.data.repository.SNRepository
-import androidx.work.ListenableWorker
+
 
 class SicenetWorkerFactory(
     private val networkRepository: SNRepository
@@ -24,7 +24,6 @@ class SicenetWorkerFactory(
                     workerParameters,
                     networkRepository
                 )
-
             else -> null
         }
     }

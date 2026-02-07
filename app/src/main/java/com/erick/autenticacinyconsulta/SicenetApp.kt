@@ -5,7 +5,6 @@ import androidx.work.Configuration
 import com.erick.autenticacinyconsulta.data.worker.SicenetWorkerFactory
 import com.erick.autenticacinyconsulta.di.DefaultAppContainer
 
-
 class SicenetApp : Application(), Configuration.Provider {
 
     lateinit var container: DefaultAppContainer

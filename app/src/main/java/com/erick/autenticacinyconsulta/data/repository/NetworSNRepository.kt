@@ -24,28 +24,22 @@ class NetworSNRepository(
             .toRequestBody("text/xml; charset=utf-8".toMediaType())
 
         val response = snApiService.acceso(body)
-
         val xml = response.string()
+
         Log.d("SICENET_XML", xml)
 
-        val accesoCorrecto =
-            xml.contains("\"acceso\":true")
+        val accesoCorrecto = xml.contains("\"acceso\":true")
 
         Log.d("SICENET_LOGIN", "Acceso correcto = $accesoCorrecto")
 
         return if (accesoCorrecto) {
-            LoginResult(
-                success = true,
-                message = "Login correcto"
-            )
+            LoginResult(true, "Login correcto")
         } else {
-            LoginResult(
-                success = false,
-                message = "Credenciales inválidas"
-            )
+            LoginResult(false, "Credenciales inválidas")
         }
     }
-    override suspend fun obtenerPerfil(): AlumnoPerfil {
+
+    override suspend fun obtenerPerfilJson(): String {
 
         val body = SoapRequestBuilder.perfil()
             .toRequestBody("text/xml; charset=utf-8".toMediaType())
@@ -53,11 +47,16 @@ class NetworSNRepository(
         val response = snApiService.getAlumnoAcademico(body)
         val xml = response.string()
 
-        Log.d("SICENET_PERFIL_XML", xml)
-
         val json = extraerJson(xml)
 
         Log.d("SICENET_PERFIL_JSON", json)
+
+        return json
+    }
+
+    override suspend fun obtenerPerfil(): AlumnoPerfil {
+
+        val json = obtenerPerfilJson()
 
         return Gson().fromJson(json, AlumnoPerfil::class.java)
     }

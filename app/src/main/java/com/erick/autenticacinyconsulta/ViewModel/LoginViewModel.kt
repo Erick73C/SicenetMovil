@@ -3,12 +3,19 @@ package com.erick.autenticacinyconsulta.ViewModel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.erick.autenticacinyconsulta.data.model.LoginResult
 import com.erick.autenticacinyconsulta.data.remote.SoapRequestBuilder
 import com.erick.autenticacinyconsulta.data.repository.SNRepository
+import com.erick.autenticacinyconsulta.data.worker.SicenetPerfilWorker
 import kotlinx.coroutines.launch
 class LoginViewModel(
-    private val snRepository: SNRepository
+    private val snRepository: SNRepository,
+    private val workManager: WorkManager
 ) : ViewModel() {
 
     fun login(
@@ -24,6 +31,7 @@ class LoginViewModel(
                 Log.d("SICENET_VM", "Resultado login: $result")
 
                 if (result.success) {
+                    encolarWorkerPerfil()
                     onSuccess()
                 } else {
                     onError("Credenciales inválidas")
@@ -33,5 +41,25 @@ class LoginViewModel(
                 onError("Error de conexión")
             }
         }
+    }
+
+    private fun encolarWorkerPerfil() {
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val workRequest = OneTimeWorkRequestBuilder<SicenetPerfilWorker>()
+            .setConstraints(constraints)
+            .addTag("WM_PERFIL")
+            .build()
+
+        workManager.enqueueUniqueWork(
+            "WM_PERFIL",
+            ExistingWorkPolicy.REPLACE,
+            workRequest
+        )
+
+        Log.d("WM_PERFIL", "Worker 1 encolado correctamente")
     }
 }
