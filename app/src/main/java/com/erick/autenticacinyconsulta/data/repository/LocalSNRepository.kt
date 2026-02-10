@@ -11,9 +11,6 @@ class LocalSNRepository(
     private val calificacionFinalDao: CalificacionFinalDao
 ) {
 
-    /* =======================
-       PERFIL
-    ======================= */
 
     suspend fun guardarPerfil(perfil: PerfilEntity) {
         perfilDao.insertarPerfil(perfil)
@@ -22,10 +19,6 @@ class LocalSNRepository(
     suspend fun obtenerPerfil(): PerfilEntity? {
         return perfilDao.obtenerPerfil()
     }
-
-    /* =======================
-       CARGA ACADÉMICA
-    ======================= */
 
     suspend fun guardarCargaAcademica(carga: List<CargaAcademicaEntity>) {
         cargaAcademicaDao.limpiar()
@@ -36,9 +29,6 @@ class LocalSNRepository(
         return cargaAcademicaDao.obtenerCargaAcademica()
     }
 
-    /* =======================
-       CARDEX
-    ======================= */
 
     suspend fun guardarCardex(cardex: List<CardexEntity>) {
         cardexDao.limpiar()
@@ -48,10 +38,6 @@ class LocalSNRepository(
     suspend fun obtenerCardex(): List<CardexEntity> {
         return cardexDao.obtenerCardex()
     }
-
-    /* =======================
-       CALIFICACIONES UNIDAD
-    ======================= */
 
     suspend fun guardarCalificacionesUnidad(
         calificaciones: List<CalificacionUnidadEntity>
@@ -63,10 +49,6 @@ class LocalSNRepository(
     suspend fun obtenerCalificacionesUnidad(): List<CalificacionUnidadEntity> {
         return calificacionUnidadDao.obtenerCalificaciones()
     }
-
-    /* =======================
-       CALIFICACIÓN FINAL
-    ======================= */
 
     suspend fun guardarCalificacionesFinales(
         calificaciones: List<CalificacionFinalEntity>

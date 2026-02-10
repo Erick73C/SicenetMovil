@@ -4,11 +4,13 @@ import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
+import com.erick.autenticacinyconsulta.data.repository.LocalSNRepository
 import com.erick.autenticacinyconsulta.data.repository.SNRepository
 
 
 class SicenetWorkerFactory(
-    private val networkRepository: SNRepository
+    private val networkRepository: SNRepository,
+    private val localRepository: LocalSNRepository
 ) : WorkerFactory() {
 
     override fun createWorker(
@@ -18,12 +20,21 @@ class SicenetWorkerFactory(
     ): ListenableWorker? {
 
         return when (workerClassName) {
+
             SicenetPerfilWorker::class.java.name ->
                 SicenetPerfilWorker(
                     appContext,
                     workerParameters,
                     networkRepository
                 )
+
+            SicenetPerfilDbWorker::class.java.name ->
+                SicenetPerfilDbWorker(
+                    appContext,
+                    workerParameters,
+                    localRepository
+                )
+
             else -> null
         }
     }

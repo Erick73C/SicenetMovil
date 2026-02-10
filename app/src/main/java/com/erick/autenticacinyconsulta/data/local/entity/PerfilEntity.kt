@@ -9,11 +9,13 @@ data class PerfilEntity(
     val nombre: String,
     val carrera: String,
     val especialidad: String,
-    val semActual: Int,
     val estatus: String,
-    val modEducativo: Int,
-    val creditosAcumulados: Int,
-    val creditosActuales: Int,
+    val semActual: Int,
+    val cdtosAcumulados: Int,
+    val cdtosActuales: Int,
     val fechaReins: String,
+    val modEducativo: Int,
+    val urlFoto: String,
+    val inscrito: Boolean,
     val ultimaActualizacion: Long
 )
