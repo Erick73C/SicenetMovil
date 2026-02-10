@@ -4,13 +4,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
-import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.erick.autenticacinyconsulta.data.model.LoginResult
-import com.erick.autenticacinyconsulta.data.remote.SoapRequestBuilder
 import com.erick.autenticacinyconsulta.data.repository.SNRepository
+import com.erick.autenticacinyconsulta.data.worker.SicenetPerfilDbWorker
 import com.erick.autenticacinyconsulta.data.worker.SicenetPerfilWorker
 import kotlinx.coroutines.launch
 class LoginViewModel(
@@ -31,7 +29,7 @@ class LoginViewModel(
                 Log.d("SICENET_VM", "Resultado login: $result")
 
                 if (result.success) {
-                    encolarWorkerPerfil()
+                    encolarWorkersPerfil()
                     onSuccess()
                 } else {
                     onError("Credenciales inválidas")
@@ -42,24 +40,27 @@ class LoginViewModel(
             }
         }
     }
-
-    private fun encolarWorkerPerfil() {
+    private fun encolarWorkersPerfil() {
 
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val workRequest = OneTimeWorkRequestBuilder<SicenetPerfilWorker>()
+        val workerPerfilRed = OneTimeWorkRequestBuilder<SicenetPerfilWorker>()
             .setConstraints(constraints)
-            .addTag("WM_PERFIL")
+            .addTag("WM_PERFIL_RED")
             .build()
 
-        workManager.enqueueUniqueWork(
-            "WM_PERFIL",
-            ExistingWorkPolicy.REPLACE,
-            workRequest
-        )
+        val workerPerfilDb = OneTimeWorkRequestBuilder<SicenetPerfilDbWorker>()
+            .addTag("WM_PERFIL_DB")
+            .build()
 
-        Log.d("WM_PERFIL", "Worker 1 encolado correctamente")
+        workManager
+            .beginWith(workerPerfilRed)
+            .then(workerPerfilDb)
+            .enqueue()
+
+        Log.d("WM_CHAIN", "Worker 1 → Worker 2 encadenados")
     }
+
 }

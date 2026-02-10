@@ -18,10 +18,14 @@ class SicenetPerfilDbWorker(
 
     override suspend fun doWork(): Result {
         return try {
-            Log.d("WM_PERFIL", "Worker 2 iniciado (guardar perfil)")
-
             val perfilJson = inputData.getString("perfil_json")
-                ?: return Result.failure()
+
+            if (perfilJson.isNullOrEmpty()) {
+                Log.e("WM_PERFIL_DB", "No llegó perfil_json")
+                return Result.failure()
+            }
+
+            Log.d("WM_PERFIL_DB", "JSON recibido")
 
             val perfil = Gson().fromJson(perfilJson, AlumnoPerfil::class.java)
 
@@ -41,15 +45,14 @@ class SicenetPerfilDbWorker(
                 ultimaActualizacion = System.currentTimeMillis()
             )
 
-
             localRepository.guardarPerfil(entity)
 
-            Log.d("WM_PERFIL", "Perfil guardado en Room")
+            Log.d("WM_PERFIL_DB", "Perfil guardado en Room")
 
             Result.success()
 
         } catch (e: Exception) {
-            Log.e("WM_PERFIL", "Error en Worker 2", e)
+            Log.e("WM_PERFIL_DB", "Error guardando perfil", e)
             Result.failure()
         }
     }

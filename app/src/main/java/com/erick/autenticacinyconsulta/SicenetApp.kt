@@ -17,7 +17,10 @@ class SicenetApp : Application(), Configuration.Provider {
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
             .setWorkerFactory(
-                SicenetWorkerFactory(container.networkSNRepository)
+                SicenetWorkerFactory(
+                    container.networkSNRepository,
+                    container.localSNRepository
+                )
             )
             .build()
 }

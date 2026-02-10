@@ -32,13 +32,13 @@ abstract class SicenetDatabase : RoomDatabase() {
 
         fun getDatabase(context: Context): SicenetDatabase {
             return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
+                Room.databaseBuilder(
                     context.applicationContext,
                     SicenetDatabase::class.java,
                     "sicenet_db"
-                ).build()
-                INSTANCE = instance
-                instance
+                ).build().also {
+                    INSTANCE = it
+                }
             }
         }
     }
