@@ -20,6 +20,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -30,19 +32,22 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.erick.autenticacinyconsulta.ViewModel.PerfilViewModel
 import com.erick.autenticacinyconsulta.ViewModel.PerfilViewModelFactory
+import com.erick.autenticacinyconsulta.data.local.entity.PerfilEntity
+import com.erick.autenticacinyconsulta.data.repository.LocalSNRepository
 import com.erick.autenticacinyconsulta.data.repository.SNRepository
 @Composable
 fun PerfilScreen(
-    snRepository: SNRepository,
+    localRepository: LocalSNRepository,
     viewModel: PerfilViewModel = viewModel(
-        factory = PerfilViewModelFactory(snRepository)
+        factory = PerfilViewModelFactory(localRepository)
     )
 ) {
     LaunchedEffect(Unit) {
         viewModel.cargarPerfil()
     }
 
-    val perfil = viewModel.perfil
+    val perfilState = viewModel.perfil.collectAsState()
+    val perfil: PerfilEntity? = perfilState.value
 
     // Colores verde personalizados (mismos que LoginScreen)
     val greenPrimary = Color(0xFF2E7D32)

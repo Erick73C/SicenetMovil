@@ -42,19 +42,22 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.erick.autenticacinyconsulta.ViewModel.LoginViewModel
 import com.erick.autenticacinyconsulta.ViewModel.LoginViewModelFactory
+import com.erick.autenticacinyconsulta.data.repository.LocalSNRepository
 import com.erick.autenticacinyconsulta.data.repository.SNRepository
 
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
-    snRepository: SNRepository
+    snRepository: SNRepository,
+    localRepository: LocalSNRepository
 ) {
     val context = LocalContext.current
 
     val viewModel: LoginViewModel = viewModel(
         factory = LoginViewModelFactory(
             context = context,
-            snRepository = snRepository
+            snRepository = snRepository,
+            localRepository = localRepository
         )
     )
 

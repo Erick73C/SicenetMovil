@@ -1,25 +1,23 @@
 package com.erick.autenticacinyconsulta.ViewModel
 
-import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.erick.autenticacinyconsulta.data.model.AlumnoPerfil
-import com.erick.autenticacinyconsulta.data.repository.SNRepository
+import com.erick.autenticacinyconsulta.data.local.entity.PerfilEntity
+import com.erick.autenticacinyconsulta.data.repository.LocalSNRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class PerfilViewModel(
-    private val snRepository: SNRepository
+    private val localRepository: LocalSNRepository
 ) : ViewModel() {
 
-    var perfil by mutableStateOf<AlumnoPerfil?>(null)
-        private set
+    private val _perfil = MutableStateFlow<PerfilEntity?>(null)
+    val perfil: StateFlow<PerfilEntity?> = _perfil
 
     fun cargarPerfil() {
         viewModelScope.launch {
-            perfil = snRepository.obtenerPerfil()
+            _perfil.value = localRepository.obtenerPerfil()
         }
     }
 }

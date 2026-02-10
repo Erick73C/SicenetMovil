@@ -30,13 +30,14 @@ class MainActivity : ComponentActivity() {
                     "login" -> {
                         LoginScreen(
                             onLoginSuccess = { pantallaActual = "perfil" },
-                            snRepository = appContainer.networkSNRepository
+                            snRepository = appContainer.networkSNRepository,
+                            localRepository = appContainer.localSNRepository
                         )
                     }
 
                     "perfil" -> {
                         PerfilScreen(
-                            snRepository = appContainer.networkSNRepository
+                            localRepository = appContainer.localSNRepository
                         )
                     }
                 }

@@ -7,12 +7,14 @@ import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.erick.autenticacinyconsulta.data.repository.LocalSNRepository
 import com.erick.autenticacinyconsulta.data.repository.SNRepository
 import com.erick.autenticacinyconsulta.data.worker.SicenetPerfilDbWorker
 import com.erick.autenticacinyconsulta.data.worker.SicenetPerfilWorker
 import kotlinx.coroutines.launch
 class LoginViewModel(
-    private val snRepository: SNRepository,
+    private val snRepository: SNRepository,        // RED
+    private val localRepository: LocalSNRepository,// Local (Rom)
     private val workManager: WorkManager
 ) : ViewModel() {
 
@@ -24,9 +26,8 @@ class LoginViewModel(
     ) {
         viewModelScope.launch {
             try {
+                // 1️⃣ Intentar login ONLINE
                 val result = snRepository.acceso(usuario, password)
-
-                Log.d("SICENET_VM", "Resultado login: $result")
 
                 if (result.success) {
                     encolarWorkersPerfil()
@@ -34,14 +35,25 @@ class LoginViewModel(
                 } else {
                     onError("Credenciales inválidas")
                 }
+
             } catch (e: Exception) {
-                Log.e("SICENET_VM", "Error login", e)
-                onError("Error de conexión")
+
+                //  FLLo internet → intentar OFFLINE
+                Log.w("LOGIN_OFFLINE", "Sin internet, intentando Room")
+
+                val perfilLocal = localRepository.obtenerPerfil()
+
+                if (perfilLocal != null) {
+                    Log.d("LOGIN_OFFLINE", "Perfil encontrado en Room")
+                    onSuccess()
+                } else {
+                    onError("Sin conexión y sin datos guardados")
+                }
             }
         }
     }
-    private fun encolarWorkersPerfil() {
 
+    private fun encolarWorkersPerfil() {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
@@ -59,8 +71,5 @@ class LoginViewModel(
             .beginWith(workerPerfilRed)
             .then(workerPerfilDb)
             .enqueue()
-
-        Log.d("WM_CHAIN", "Worker 1 → Worker 2 encadenados")
     }
-
 }
