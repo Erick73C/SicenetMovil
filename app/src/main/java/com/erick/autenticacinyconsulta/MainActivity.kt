@@ -4,11 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.erick.autenticacinyconsulta.ui.navigation.AppScaffold
+import com.erick.autenticacinyconsulta.ui.navigation.Routes
 import com.erick.autenticacinyconsulta.ui.theme.AutenticaciónYConsultaTheme
+import com.erick.autenticacinyconsulta.ui.theme.Screen.CargaAcademicaScreen
 import com.erick.autenticacinyconsulta.ui.theme.Screen.LoginScreen
 import com.erick.autenticacinyconsulta.ui.theme.Screen.PerfilScreen
 
@@ -23,22 +25,40 @@ class MainActivity : ComponentActivity() {
         setContent {
             AutenticaciónYConsultaTheme {
 
-                var pantallaActual by remember { mutableStateOf("login") }
+                val navController = rememberNavController()
 
-                when (pantallaActual) {
+                NavHost(
+                    navController = navController,
+                    startDestination = Routes.LOGIN
+                ) {
 
-                    "login" -> {
+
+                    composable(Routes.LOGIN) {
                         LoginScreen(
-                            onLoginSuccess = { pantallaActual = "perfil" },
+                            onLoginSuccess = {
+                                navController.navigate(Routes.PERFIL) {
+                                    popUpTo(Routes.LOGIN) { inclusive = true }
+                                }
+                            },
                             snRepository = appContainer.networkSNRepository,
                             localRepository = appContainer.localSNRepository
                         )
                     }
 
-                    "perfil" -> {
-                        PerfilScreen(
-                            localRepository = appContainer.localSNRepository
-                        )
+                    composable(Routes.PERFIL) {
+                        AppScaffold(navController) {
+                            PerfilScreen(
+                                localRepository = appContainer.localSNRepository
+                            )
+                        }
+                    }
+
+                    composable(Routes.CARGA) {
+                        AppScaffold(navController) {
+                            CargaAcademicaScreen(
+                                localRepository = appContainer.localSNRepository
+                            )
+                        }
                     }
                 }
             }

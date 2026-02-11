@@ -15,7 +15,7 @@ import com.erick.autenticacinyconsulta.data.local.entity.*
         CalificacionUnidadEntity::class,
         CalificacionFinalEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class SicenetDatabase : RoomDatabase() {
@@ -36,7 +36,9 @@ abstract class SicenetDatabase : RoomDatabase() {
                     context.applicationContext,
                     SicenetDatabase::class.java,
                     "sicenet_db"
-                ).build().also {
+                )
+                    .fallbackToDestructiveMigration()
+                    .build().also {
                     INSTANCE = it
                 }
             }

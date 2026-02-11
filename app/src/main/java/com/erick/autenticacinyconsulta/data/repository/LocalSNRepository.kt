@@ -2,6 +2,7 @@ package com.erick.autenticacinyconsulta.data.repository
 
 import com.erick.autenticacinyconsulta.data.local.dao.*
 import com.erick.autenticacinyconsulta.data.local.entity.*
+import kotlinx.coroutines.flow.Flow
 
 class LocalSNRepository(
     private val perfilDao: PerfilDao,
@@ -25,10 +26,13 @@ class LocalSNRepository(
         cargaAcademicaDao.insertarTodo(carga)
     }
 
-    suspend fun obtenerCargaAcademica(): List<CargaAcademicaEntity> {
+    fun obtenerCargaAcademica(): Flow<List<CargaAcademicaEntity>> {
         return cargaAcademicaDao.obtenerCargaAcademica()
     }
 
+    fun obtenerUltimaActualizacionCargaFlow(): Flow<Long?> {
+        return cargaAcademicaDao.obtenerUltimaActualizacionFlow()
+    }
 
     suspend fun guardarCardex(cardex: List<CardexEntity>) {
         cardexDao.limpiar()
