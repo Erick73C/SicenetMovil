@@ -1,10 +1,12 @@
 package com.erick.autenticacinyconsulta.data.local.dao
+// Cris
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.erick.autenticacinyconsulta.data.local.entity.CalificacionFinalEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CalificacionFinalDao {
@@ -13,7 +15,7 @@ interface CalificacionFinalDao {
     suspend fun insertarTodo(calificaciones: List<CalificacionFinalEntity>)
 
     @Query("SELECT * FROM calificacion_final")
-    suspend fun obtenerCalificacionesFinales(): List<CalificacionFinalEntity>
+    fun obtenerCalificacionesFinales(): Flow<List<CalificacionFinalEntity>>
 
     @Query("DELETE FROM calificacion_final")
     suspend fun limpiar()

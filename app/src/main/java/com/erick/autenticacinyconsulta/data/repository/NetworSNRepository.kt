@@ -73,6 +73,19 @@ class NetworSNRepository(
         val response = snApiService.getCardex(body)
         return response.string()
     }
+// cris
+    override suspend fun obtenerCalificacionesXml(): String {
+        val body = SoapRequestBuilder.calificaciones()
+            .toRequestBody("text/xml; charset=utf-8".toMediaType())
+        val response = snApiService.getCalificaciones(body)
+        return response.string()
+    }
 
-
+    //para soportar la descrga de la carga academica
+    override suspend fun obtenerCargaAcademicaXml(): String {
+        val body = SoapRequestBuilder.cargaAcademica()
+            .toRequestBody("text/xml; charset=utf-8".toMediaType())
+        val response = snApiService.getCargaAcademicaByAlumno(body)
+        return response.string()
+    }
 }

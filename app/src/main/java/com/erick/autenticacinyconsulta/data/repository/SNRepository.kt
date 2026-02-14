@@ -1,4 +1,5 @@
 package com.erick.autenticacinyconsulta.data.repository
+// Cris
 
 import com.erick.autenticacinyconsulta.data.model.AlumnoPerfil
 import com.erick.autenticacinyconsulta.data.model.LoginResult
@@ -10,4 +11,7 @@ interface SNRepository {
     suspend fun obtenerPerfilJson(): String
 
     suspend fun obtenerCardexXml(): String
+    suspend fun obtenerCalificacionesXml(): String
+    //obtiene la carga academica
+    suspend fun obtenerCargaAcademicaXml(): String
 }

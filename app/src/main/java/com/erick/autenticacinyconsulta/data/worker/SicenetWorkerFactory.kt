@@ -1,4 +1,5 @@
 package com.erick.autenticacinyconsulta.data.worker
+// Cris
 
 import android.content.Context
 import androidx.work.ListenableWorker
@@ -30,6 +31,34 @@ class SicenetWorkerFactory(
 
             SicenetPerfilDbWorker::class.java.name ->
                 SicenetPerfilDbWorker(
+                    appContext,
+                    workerParameters,
+                    localRepository
+                )
+
+            SicenetCalificacionesWorker::class.java.name ->
+                SicenetCalificacionesWorker(
+                    appContext,
+                    workerParameters,
+                    networkRepository
+                )
+
+            SicenetCalificacionesDbWorker::class.java.name ->
+                SicenetCalificacionesDbWorker(
+                    appContext,
+                    workerParameters,
+                    localRepository
+                )
+
+            SicenetCargaAcademicaWorker::class.java.name ->
+                SicenetCargaAcademicaWorker(
+                    appContext,
+                    workerParameters,
+                    networkRepository
+                )
+
+            SicenetCargaAcademicaDbWorker::class.java.name ->
+                SicenetCargaAcademicaDbWorker(
                     appContext,
                     workerParameters,
                     localRepository

@@ -5,6 +5,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.erick.autenticacinyconsulta.di.AppContainer
+import com.erick.autenticacinyconsulta.ui.theme.Screen.CalificacionesScreen
+import com.erick.autenticacinyconsulta.ui.theme.Screen.CardexScreen
 import com.erick.autenticacinyconsulta.ui.theme.Screen.CargaAcademicaScreen
 import com.erick.autenticacinyconsulta.ui.theme.Screen.LoginScreen
 import com.erick.autenticacinyconsulta.ui.theme.Screen.PerfilScreen
@@ -39,6 +41,18 @@ fun AppNavHost(
 
         composable(Routes.CARGA) {
             CargaAcademicaScreen(
+                localRepository = appContainer.localSNRepository
+            )
+        }
+
+        composable(Routes.CALIFICACIONES) {
+            CalificacionesScreen(
+                localRepository = appContainer.localSNRepository
+            )
+        }
+
+        composable(Routes.CARDEX) {
+            CardexScreen(
                 localRepository = appContainer.localSNRepository
             )
         }

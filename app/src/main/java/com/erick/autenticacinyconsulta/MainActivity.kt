@@ -14,6 +14,7 @@ import com.erick.autenticacinyconsulta.ui.theme.Screen.CardexScreen
 import com.erick.autenticacinyconsulta.ui.theme.Screen.CargaAcademicaScreen
 import com.erick.autenticacinyconsulta.ui.theme.Screen.LoginScreen
 import com.erick.autenticacinyconsulta.ui.theme.Screen.PerfilScreen
+import com.erick.autenticacinyconsulta.ui.theme.Screen.CalificacionesScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -65,6 +66,14 @@ class MainActivity : ComponentActivity() {
                     composable(Routes.CARDEX) {
                         AppScaffold(navController) {
                             CardexScreen(
+                                localRepository = appContainer.localSNRepository
+                            )
+                        }
+                    }
+
+                    composable(Routes.CALIFICACIONES){
+                        AppScaffold(navController) {
+                            CalificacionesScreen(
                                 localRepository = appContainer.localSNRepository
                             )
                         }

@@ -1,45 +1,43 @@
 package com.erick.autenticacinyconsulta.data.worker
+// Cris
 
 import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.erick.autenticacinyconsulta.data.local.db.SicenetDatabase
 import com.erick.autenticacinyconsulta.data.mapper.CargaAcademicaXmlParser
 import com.erick.autenticacinyconsulta.data.repository.LocalSNRepository
 
 class SicenetCargaAcademicaDbWorker(
     context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
+    private val localRepository: LocalSNRepository
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
+        return try {
+            val xml = inputData.getString("carga_xml") ?: return Result.failure()
 
-        val xml = inputData.getString("carga_xml") ?: return Result.failure()
+            Log.d("WM_CARGA_DB", "Procesando XML de carga académica")
 
-        val db = SicenetDatabase.Companion.getDatabase(applicationContext)
+            val perfil = localRepository.obtenerPerfil()
+                ?: return Result.failure()
 
-        val localRepo = LocalSNRepository(
-            db.perfilDao(),
-            db.cargaAcademicaDao(),
-            db.cardexDao(),
-            db.calificacionUnidadDao(),
-            db.calificacionFinalDao()
-        )
+            val lista = CargaAcademicaXmlParser.parse(
+                xml = xml,
+                matricula = perfil.matricula,
+                semestre = perfil.semActual
+            )
 
-        val perfil = db.perfilDao().obtenerPerfil()
-            ?: return Result.failure()
+            // limpiar datos anteriores para evitar materias duplicadas
+            localRepository.guardarCargaAcademica(lista)
 
-        val lista = CargaAcademicaXmlParser.parse(
-            xml = xml,
-            matricula = perfil.matricula,
-            semestre = perfil.semActual
-        )
+            Log.d("WM_CARGA_DB", "Carga académica actualizada correctamente (${lista.size} registros)")
 
-        localRepo.guardarCargaAcademica(lista)
-
-        Log.d("WM_CARGA_DB", "Carga académica guardada (${lista.size})")
-
-        return Result.success()
+            Result.success()
+        } catch (e: Exception) {
+            Log.e("WM_CARGA_DB", "Error guardando carga académica", e)
+            Result.failure()
+        }
     }
 }

@@ -1,4 +1,5 @@
 package com.erick.autenticacinyconsulta.data.repository
+// Cris
 
 import com.erick.autenticacinyconsulta.data.local.dao.*
 import com.erick.autenticacinyconsulta.data.local.entity.*
@@ -54,7 +55,7 @@ class LocalSNRepository(
         calificacionUnidadDao.insertarTodo(calificaciones)
     }
 
-    suspend fun obtenerCalificacionesUnidad(): List<CalificacionUnidadEntity> {
+    fun obtenerCalificacionesUnidad(): Flow<List<CalificacionUnidadEntity>> {
         return calificacionUnidadDao.obtenerCalificaciones()
     }
 
@@ -65,7 +66,7 @@ class LocalSNRepository(
         calificacionFinalDao.insertarTodo(calificaciones)
     }
 
-    suspend fun obtenerCalificacionesFinales(): List<CalificacionFinalEntity> {
+    fun obtenerCalificacionesFinales(): Flow<List<CalificacionFinalEntity>> {
         return calificacionFinalDao.obtenerCalificacionesFinales()
     }
 }
