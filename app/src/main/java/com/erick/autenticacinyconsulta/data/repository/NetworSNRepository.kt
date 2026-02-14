@@ -5,7 +5,6 @@ import com.erick.autenticacinyconsulta.data.model.AlumnoPerfil
 import com.erick.autenticacinyconsulta.data.model.LoginResult
 import com.erick.autenticacinyconsulta.data.remote.SICENETWService
 import com.erick.autenticacinyconsulta.data.remote.SoapRequestBuilder
-import com.erick.autenticacinyconsulta.data.repository.SNRepository
 import com.google.gson.Gson
 
 import okhttp3.MediaType.Companion.toMediaType
@@ -65,5 +64,15 @@ class NetworSNRepository(
         return xml.substringAfter("<getAlumnoAcademicoResult>")
             .substringBefore("</getAlumnoAcademicoResult>")
     }
+
+    override suspend fun obtenerCardexXml(): String {
+
+        val body = SoapRequestBuilder.cardex(1)
+            .toRequestBody("text/xml; charset=utf-8".toMediaType())
+
+        val response = snApiService.getCardex(body)
+        return response.string()
+    }
+
 
 }

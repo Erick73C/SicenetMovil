@@ -26,7 +26,7 @@ class LoginViewModel(
     ) {
         viewModelScope.launch {
             try {
-                // 1️⃣ Intentar login ONLINE
+                // intentar lgin online
                 val result = snRepository.acceso(usuario, password)
 
                 if (result.success) {
@@ -38,8 +38,8 @@ class LoginViewModel(
 
             } catch (e: Exception) {
 
-                //  FLLo internet → intentar OFFLINE
-                Log.w("LOGIN_OFFLINE", "Sin internet, intentando Room")
+                //  prueba
+               //Log.w("LOGIN_OFFLINE", "Sin internet, intentando Room")
 
                 val perfilLocal = localRepository.obtenerPerfil()
 

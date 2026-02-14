@@ -39,8 +39,12 @@ class LocalSNRepository(
         cardexDao.insertarTodo(cardex)
     }
 
-    suspend fun obtenerCardex(): List<CardexEntity> {
+    fun obtenerCardex(): Flow<List<CardexEntity>> {
         return cardexDao.obtenerCardex()
+    }
+
+    fun obtenerUltimaActualizacionCardex(): Flow<Long?> {
+        return cardexDao.obtenerUltimaActualizacionCardex()
     }
 
     suspend fun guardarCalificacionesUnidad(

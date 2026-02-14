@@ -8,4 +8,6 @@ interface SNRepository {
     suspend fun acceso(matricula: String, password: String): LoginResult
     suspend fun obtenerPerfil(): AlumnoPerfil
     suspend fun obtenerPerfilJson(): String
+
+    suspend fun obtenerCardexXml(): String
 }

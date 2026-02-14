@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import com.erick.autenticacinyconsulta.ui.navigation.AppScaffold
 import com.erick.autenticacinyconsulta.ui.navigation.Routes
 import com.erick.autenticacinyconsulta.ui.theme.AutenticaciónYConsultaTheme
+import com.erick.autenticacinyconsulta.ui.theme.Screen.CardexScreen
 import com.erick.autenticacinyconsulta.ui.theme.Screen.CargaAcademicaScreen
 import com.erick.autenticacinyconsulta.ui.theme.Screen.LoginScreen
 import com.erick.autenticacinyconsulta.ui.theme.Screen.PerfilScreen
@@ -60,6 +61,15 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     }
+
+                    composable(Routes.CARDEX) {
+                        AppScaffold(navController) {
+                            CardexScreen(
+                                localRepository = appContainer.localSNRepository
+                            )
+                        }
+                    }
+
                 }
             }
         }
