@@ -37,12 +37,22 @@ interface SICENETWService {
     //cris
     @Headers(
         "Content-Type: text/xml; charset=utf-8",
-        "SOAPAction: http://tempuri.org/getCalificacionesByAlumno"
+        "SOAPAction: http://tempuri.org/getCalifUnidadesByAlumno"
     )
     @POST("wsalumnos.asmx")
-    suspend fun getCalificaciones(
+    suspend fun getCalifUnidadesByAlumno(
         @Body soap: RequestBody
     ): ResponseBody
+
+    @Headers(
+        "Content-Type: text/xml; charset=utf-8",
+        "SOAPAction: http://tempuri.org/getAllCalifFinalByAlumnos"
+    )
+    @POST("wsalumnos.asmx")
+    suspend fun getAllCalifFinalByAlumnos(
+        @Body soap: RequestBody
+    ): ResponseBody
+
 
     @Headers(
         "Content-Type: text/xml; charset=utf-8",

@@ -74,12 +74,21 @@ class NetworSNRepository(
         return response.string()
     }
 // cris
-    override suspend fun obtenerCalificacionesXml(): String {
-        val body = SoapRequestBuilder.calificaciones()
+    override suspend fun obtenerCalificacionesUnidadesXml(): String {
+        val body = SoapRequestBuilder.calificacionesUnidades()
             .toRequestBody("text/xml; charset=utf-8".toMediaType())
-        val response = snApiService.getCalificaciones(body)
+        val response = snApiService.getCalifUnidadesByAlumno(body)
         return response.string()
     }
+
+    override suspend fun obtenerCalificacionesFinalesXml(modEducativo: Int): String {
+        val body = SoapRequestBuilder.calificacionesFinales(modEducativo)
+            .toRequestBody("text/xml; charset=utf-8".toMediaType())
+        val response = snApiService.getAllCalifFinalByAlumnos(body)
+        return response.string()
+    }
+
+
 
     //para soportar la descrga de la carga academica
     override suspend fun obtenerCargaAcademicaXml(): String {

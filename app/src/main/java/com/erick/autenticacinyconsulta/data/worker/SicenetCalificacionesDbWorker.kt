@@ -15,12 +15,15 @@ class SicenetCalificacionesDbWorker(
 
     override suspend fun doWork(): Result {
         return try {
-            val xml = inputData.getString("calif_xml")
+            val unidadesXml = inputData.getString("unidades_xml")
+                ?: return Result.failure()
+            val finalesXml = inputData.getString("finales_xml")
                 ?: return Result.failure()
 
             Log.d("WM_CALIF_DB", "Procesando XML de calificaciones")
 
-            val resultado = CalificacionesXmlParser.parse(xml)
+            val resultado = CalificacionesXmlParser.parse(unidadesXml, finalesXml)
+
 
             // guardar calif final
             localRepository.guardarCalificacionesFinales(resultado.finales)

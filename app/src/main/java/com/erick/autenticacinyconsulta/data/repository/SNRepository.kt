@@ -11,7 +11,10 @@ interface SNRepository {
     suspend fun obtenerPerfilJson(): String
 
     suspend fun obtenerCardexXml(): String
-    suspend fun obtenerCalificacionesXml(): String
+    suspend fun obtenerCalificacionesUnidadesXml(): String
+    suspend fun obtenerCalificacionesFinalesXml(modEducativo: Int): String
+
+
     //obtiene la carga academica
     suspend fun obtenerCargaAcademicaXml(): String
 }

@@ -18,14 +18,19 @@ class SicenetCalificacionesWorker(
 
             Log.d("WM_CALIF_RED", "Consultando calificaciones")
 
-            val xml = repository.obtenerCalificacionesXml()
+            val unidadesXml = repository.obtenerCalificacionesUnidadesXml()
+            val finalesXml = repository.obtenerCalificacionesFinalesXml(1) // Por defecto 1 o 0
 
-            Log.d("CALIF_XML_COMPLETO", xml)
-            Log.d("WM_CALIF_RED", "XML recibido correctamente")
+
+            Log.d("WM_CALIF_RED", "XMLs recibidos correctamente")
 
             Result.success(
-                workDataOf("calif_xml" to xml)
+                workDataOf(
+                    "unidades_xml" to unidadesXml,
+                    "finales_xml" to finalesXml
+                )
             )
+
 
         } catch (e: Exception) {
             Log.e("WM_CALIF_RED", "Error", e)

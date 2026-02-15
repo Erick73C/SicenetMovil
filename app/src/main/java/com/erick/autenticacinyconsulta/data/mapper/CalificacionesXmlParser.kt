@@ -11,69 +11,89 @@ object CalificacionesXmlParser {
         val unidades: List<CalificacionUnidadEntity>
     )
 
-    fun parse(xml: String): Resultado {
+    fun parse(unidadesXml: String, finalesXml: String): Resultado {
         val finales = mutableListOf<CalificacionFinalEntity>()
         val unidades = mutableListOf<CalificacionUnidadEntity>()
 
-        Log.d("CALIF_PARSE", "Iniciando parseo de XML. Tamaño: ${xml.length}")
+        Log.d("CALIF_PARSE", "Iniciando parseo de XMLs. Unidades: ${unidadesXml.length}, Finales: ${finalesXml.length}")
 
-        // Búsqueda más flexible del contenido
+        // 1. Parsear Finales
+        parseFinales(finalesXml, finales)
+
+        // 2. Parsear Unidades
+        parseUnidades(unidadesXml, unidades)
+
+        return Resultado(finales, unidades)
+    }
+
+    private fun parseFinales(xml: String, list: MutableList<CalificacionFinalEntity>) {
         val contenido = try {
-            if (xml.contains("<getCalificacionesByAlumnoResult>")) {
+            if (xml.contains("<getAllCalifFinalByAlumnosResult>")) {
+                xml.substringAfter("<getAllCalifFinalByAlumnosResult>")
+                    .substringBefore("</getAllCalifFinalByAlumnosResult>")
+            } else if (xml.contains("<getCalificacionesByAlumnoResult>")) {
+                // Fallback por si acaso
                 xml.substringAfter("<getCalificacionesByAlumnoResult>")
                     .substringBefore("</getCalificacionesByAlumnoResult>")
             } else {
-                Log.e("CALIF_PARSE", "No se encontró el tag <getCalificacionesByAlumnoResult>")
-                return Resultado(finales, unidades)
+                Log.e("CALIF_PARSE", "No se encontró el tag de resultados finales")
+                return
             }
         } catch (e: Exception) {
-            Log.e("CALIF_PARSE", "Error extrayendo contenido del XML", e)
-            return Resultado(finales, unidades)
+            Log.e("CALIF_PARSE", "Error extrayendo finales", e)
+            return
         }
 
-        val jsonLimpio = contenido
-            .replace("&lt;", "<")
-            .replace("&gt;", ">")
-            .replace("&amp;", "&")
-            .trim()
-
-        Log.d("CALIF_PARSE_RAW", "JSON extraído: $jsonLimpio")
-
-        if (jsonLimpio.isBlank() || jsonLimpio == "[]" || jsonLimpio == "{}") {
-            Log.w("CALIF_PARSE", "El contenido JSON está vacío")
-            return Resultado(finales, unidades)
-        }
+        val jsonLimpio = limpiarXml(contenido)
+        if (jsonLimpio.isBlank() || jsonLimpio == "[]" || jsonLimpio == "{}") return
 
         try {
             val jsonObject = JSONObject(jsonLimpio)
-            val jsonArray = jsonObject.optJSONArray("lstCalif")
-            
-            if (jsonArray == null) {
-                Log.e("CALIF_PARSE", "No se encontró el array 'lstCalif' en el JSON")
-                return Resultado(finales, unidades)
-            }
+            val jsonArray = jsonObject.optJSONArray("lstCalif") ?: return
+            val timestamp = System.currentTimeMillis()
 
-            Log.d("CALIF_PARSE", "Se encontraron ${jsonArray.length()} materias")
+            for (i in 0 until jsonArray.length()) {
+                val item = jsonArray.getJSONObject(i)
+                list.add(
+                    CalificacionFinalEntity(
+                        materia = item.optString("Materia", "Desconocida"),
+                        calificacionFinal = item.optInt("Calif", 0),
+                        acreditado = item.optString("Acred", ""),
+                        ultimaActualizacion = timestamp
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            Log.e("CALIF_PARSE", "Error parseando finales", e)
+        }
+    }
+
+    private fun parseUnidades(xml: String, list: MutableList<CalificacionUnidadEntity>) {
+        val contenido = try {
+            if (xml.contains("<getCalifUnidadesByAlumnoResult>")) {
+                xml.substringAfter("<getCalifUnidadesByAlumnoResult>")
+                    .substringBefore("</getCalifUnidadesByAlumnoResult>")
+            } else {
+                Log.e("CALIF_PARSE", "No se encontró el tag de resultados unidades")
+                return
+            }
+        } catch (e: Exception) {
+            Log.e("CALIF_PARSE", "Error extrayendo unidades", e)
+            return
+        }
+
+        val jsonLimpio = limpiarXml(contenido)
+        if (jsonLimpio.isBlank() || jsonLimpio == "[]" || jsonLimpio == "{}") return
+
+        try {
+            val jsonObject = JSONObject(jsonLimpio)
+            val jsonArray = jsonObject.optJSONArray("lstCalif") ?: return
             val timestamp = System.currentTimeMillis()
 
             for (i in 0 until jsonArray.length()) {
                 val item = jsonArray.getJSONObject(i)
                 val materia = item.optString("Materia", "Desconocida")
 
-                // Calificación final
-                val califFinal = item.optInt("Calif", -1)
-                val acred = item.optString("Acred", "")
-
-                finales.add(
-                    CalificacionFinalEntity(
-                        materia = materia,
-                        calificacionFinal = if (califFinal == -1) 0 else califFinal,
-                        acreditado = acred,
-                        ultimaActualizacion = timestamp
-                    )
-                )
-
-                // Calificaciones por unidad (C1 a C13)
                 for (u in 1..13) {
                     val key = "C$u"
                     if (item.has(key)) {
@@ -81,7 +101,7 @@ object CalificacionesXmlParser {
                         if (califVal.isNotBlank() && califVal != "null") {
                             val califInt = try { califVal.toInt() } catch(e: Exception) { -1 }
                             if (califInt != -1) {
-                                unidades.add(
+                                list.add(
                                     CalificacionUnidadEntity(
                                         materia = materia,
                                         unidad = u,
@@ -94,12 +114,16 @@ object CalificacionesXmlParser {
                     }
                 }
             }
-            Log.d("CALIF_PARSE_SUCCESS", "Parseo completado: ${finales.size} finales, ${unidades.size} unidades")
-
         } catch (e: Exception) {
-            Log.e("CALIF_PARSE_ERROR", "Error parseando JSON de calificaciones", e)
+            Log.e("CALIF_PARSE", "Error parseando unidades", e)
         }
-
-        return Resultado(finales, unidades)
     }
+
+    private fun limpiarXml(xml: String): String {
+        return xml.replace("&lt;", "<")
+            .replace("&gt;", ">")
+            .replace("&amp;", "&")
+            .trim()
+    }
+
 }
