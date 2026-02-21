@@ -30,7 +30,7 @@ interface SICENETWService {
         "Content-Type: text/xml; charset=utf-8",
         "SOAPAction: http://tempuri.org/getAllKardexConPromedioByAlumno"
     )
-    @POST("wsalumnos.asmx")
+    @POST("/ws/wsalumnos.asmx")
     suspend fun getCardex(
         @Body soap: RequestBody
     ): ResponseBody
@@ -39,7 +39,7 @@ interface SICENETWService {
         "Content-Type: text/xml; charset=utf-8",
         "SOAPAction: http://tempuri.org/getCalifUnidadesByAlumno"
     )
-    @POST("wsalumnos.asmx")
+    @POST("/ws/wsalumnos.asmx")
     suspend fun getCalifUnidadesByAlumno(
         @Body soap: RequestBody
     ): ResponseBody
@@ -48,7 +48,7 @@ interface SICENETWService {
         "Content-Type: text/xml; charset=utf-8",
         "SOAPAction: http://tempuri.org/getAllCalifFinalByAlumnos"
     )
-    @POST("wsalumnos.asmx")
+    @POST("/ws/wsalumnos.asmx")
     suspend fun getAllCalifFinalByAlumnos(
         @Body soap: RequestBody
     ): ResponseBody
@@ -58,7 +58,7 @@ interface SICENETWService {
         "Content-Type: text/xml; charset=utf-8",
         "SOAPAction: http://tempuri.org/getCargaAcademicaByAlumno"
     )
-    @POST("wsalumnos.asmx")
+    @POST("/ws/wsalumnos.asmx")
     suspend fun getCargaAcademicaByAlumno(
         @Body soap: RequestBody
     ): ResponseBody

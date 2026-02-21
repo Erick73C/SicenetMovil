@@ -12,6 +12,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.erick.autenticacinyconsulta.ViewModel.CalificacionesViewModel
 import com.erick.autenticacinyconsulta.ViewModel.CalificacionesViewModelFactory
@@ -86,13 +88,6 @@ fun TableHeader() {
             fontSize = 14.sp
         )
         Text(
-            text = "Unidades",
-            modifier = Modifier.weight(1.5f),
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-        )
-        Text(
             text = "Final",
             modifier = Modifier.weight(0.7f),
             fontWeight = FontWeight.Bold,
@@ -103,6 +98,7 @@ fun TableHeader() {
 }
 
 // fila individual de la tabla que representa una materia
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CalificacionRow(
     materiaFinal: CalificacionFinalEntity,
@@ -113,59 +109,88 @@ fun CalificacionRow(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                .padding(12.dp)
         ) {
-            // Nombre de la Materia
-            Text(
-                text = materiaFinal.materia,
-                modifier = Modifier.weight(2f),
-                fontSize = 12.sp,
-                lineHeight = 16.sp,
-                fontWeight = FontWeight.Medium
-            )
-
-            // Unidades (C1, C2, C3...)
-            Column(
-                modifier = Modifier.weight(1.5f),
-                horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
             ) {
-                if (unidades.isEmpty() || (unidades.size == 1 && unidades[0].calificacion == 0)) {
-                    Text("Pendiente", fontSize = 11.sp, color = Color.Gray)
-                } else {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
+                // Nombre de la Materia
+                Text(
+                    text = materiaFinal.materia,
+                    modifier = Modifier.weight(2f),
+                    fontSize = 13.sp,
+                    lineHeight = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1B5E20)
+                )
+
+                // Calificación Final
+                Box(
+                    modifier = Modifier.weight(0.7f),
+                    contentAlignment = androidx.compose.ui.Alignment.Center
+                ) {
+                    Surface(
+                        color = if (materiaFinal.calificacionFinal >= 70) Color(0xFFE8F5E9) else Color(0xFFFFEBEE),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp)
                     ) {
-                        unidades.take(4).forEach { unidad ->
-                            Badge(
-                                containerColor = if (unidad.calificacion >= 70) Color(0xFFC8E6C9) else Color(0xFFFFCDD2),
-                                modifier = Modifier.padding(2.dp)
-                            ) {
-                                Text("U${unidad.unidad}: ${unidad.calificacion}", fontSize = 10.sp)
-                            }
-                        }
-                    }
-                    if (unidades.size > 4) {
-                        Text("y ${unidades.size - 4} más...", fontSize = 9.sp, color = Color.Gray)
+                        Text(
+                            text = if (materiaFinal.calificacionFinal == 0) "-" else "${materiaFinal.calificacionFinal}",
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            fontWeight = FontWeight.Bold,
+                            color = if (materiaFinal.calificacionFinal >= 70) Color(0xFF2E7D32) else Color.Red,
+                            fontSize = 16.sp
+                        )
                     }
                 }
             }
 
-            // Calificación Final
-            Box(
-                modifier = Modifier.weight(0.7f),
-                contentAlignment = androidx.compose.ui.Alignment.Center
-            ) {
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp),
+                thickness = 0.5.dp,
+                color = Color.LightGray.copy(alpha = 0.5f)
+            )
+
+            // parte para las
+            Text(
+                text = "Detalle por Unidades:",
+                fontSize = 10.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.Gray,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+
+            if (unidades.isEmpty() || (unidades.size == 1 && unidades[0].calificacion == 0)) {
                 Text(
-                    text = if (materiaFinal.calificacionFinal == 0) "-" else "${materiaFinal.calificacionFinal}",
-                    fontWeight = FontWeight.Bold,
-                    color = if (materiaFinal.calificacionFinal >= 70) Color(0xFF2E7D32) else Color.Red,
-                    fontSize = 16.sp
+                    text = "Aún no se han capturado evaluaciones.",
+                    fontSize = 11.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(start = 4.dp)
                 )
+            } else {
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    unidades.forEach { unidad ->
+                        Badge(
+                            containerColor = if (unidad.calificacion >= 70) Color(0xFFC8E6C9) else Color(0xFFFFCDD2),
+                            contentColor = Color.DarkGray,
+                            modifier = Modifier.height(24.dp)
+                        ) {
+                            Text(
+                                text = "U${unidad.unidad}: ${unidad.calificacion}",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier.padding(horizontal = 4.dp)
+                            )
+                        }
+                    }
+                }
             }
         }
     }
