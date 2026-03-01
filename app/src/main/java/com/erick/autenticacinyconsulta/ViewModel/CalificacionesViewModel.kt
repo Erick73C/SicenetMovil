@@ -3,6 +3,7 @@ package com.erick.autenticacinyconsulta.ViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.erick.autenticacinyconsulta.SessionManager
 import com.erick.autenticacinyconsulta.data.local.entity.CalificacionFinalEntity
 import com.erick.autenticacinyconsulta.data.local.entity.CalificacionUnidadEntity
 import com.erick.autenticacinyconsulta.data.local.entity.CargaAcademicaEntity
@@ -17,7 +18,8 @@ class CalificacionesViewModel(
 ) : ViewModel() {
 
     // Materias inscritas
-    private val cargaAcademica = repository.obtenerCargaAcademica()
+    private val matricula = SessionManager.matricula
+    private val cargaAcademica = repository.obtenerCargaAcademica(matricula)
     
     // Calificaciones guardadas
     private val calificacionesFinalesRaw = repository.obtenerCalificacionesFinales()

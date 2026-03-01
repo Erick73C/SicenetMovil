@@ -7,10 +7,12 @@ import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.erick.autenticacinyconsulta.SessionManager
 import com.erick.autenticacinyconsulta.data.repository.LocalSNRepository
 import com.erick.autenticacinyconsulta.data.repository.SNRepository
 import com.erick.autenticacinyconsulta.data.worker.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
 
 class LoginViewModel(
     private val snRepository: SNRepository,        // RED
@@ -30,6 +32,8 @@ class LoginViewModel(
                 val result = snRepository.acceso(usuario, password)
 
                 if (result.success) {
+                    val usuarioNormalizado = usuario.uppercase()
+                    SessionManager.iniciarSesion(usuarioNormalizado)
                     encolarWorkersSincronizacion()
                     onSuccess()
                 } else {
@@ -37,9 +41,20 @@ class LoginViewModel(
                 }
 
             } catch (e: Exception) {
-                val perfilLocal = localRepository.obtenerPerfil()
+
+                val usuarioNormalizado = usuario.trim().uppercase()
+
+                Log.d("LOGIN_OFFLINE", "Buscando usuario: '$usuarioNormalizado'")
+
+                val perfilLocal = localRepository
+                    .obtenerPerfil(usuarioNormalizado)
+                    .first()
 
                 if (perfilLocal != null) {
+
+
+                    SessionManager.iniciarSesion(usuarioNormalizado)
+
                     Log.d("LOGIN_OFFLINE", "Perfil encontrado en Room")
                     onSuccess()
                 } else {
@@ -51,41 +66,45 @@ class LoginViewModel(
 
     // inicia la sincronización de toda la informacion del alumno en segundo plano
     private fun encolarWorkersSincronizacion() {
+
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        // 1 configurar descarga de perfil
         val workerPerfilRed = OneTimeWorkRequestBuilder<SicenetPerfilWorker>()
             .setConstraints(constraints)
-            .addTag("WM_PERFIL_RED")
-            .build()
-        val workerPerfilDb = OneTimeWorkRequestBuilder<SicenetPerfilDbWorker>()
-            .addTag("WM_PERFIL_DB")
             .build()
 
-        // 2 configurar descarga de acrga academica (lista de todas las materias)
+        val workerPerfilDb = OneTimeWorkRequestBuilder<SicenetPerfilDbWorker>()
+            .build()
+
         val workerCargaRed = OneTimeWorkRequestBuilder<SicenetCargaAcademicaWorker>()
             .setConstraints(constraints)
-            .addTag("WM_CARGA_RED")
-            .build()
-        val workerCargaDb = OneTimeWorkRequestBuilder<SicenetCargaAcademicaDbWorker>()
-            .addTag("WM_CARGA_DB")
             .build()
 
-        // 3 configurar descarga de calificaciones actuales
+        val workerCargaDb = OneTimeWorkRequestBuilder<SicenetCargaAcademicaDbWorker>()
+            .build()
+
         val workerCalifRed = OneTimeWorkRequestBuilder<SicenetCalificacionesWorker>()
             .setConstraints(constraints)
-            .addTag("WM_CALIF_RED")
-            .build()
-        val workerCalifDb = OneTimeWorkRequestBuilder<SicenetCalificacionesDbWorker>()
-            .addTag("WM_CALIF_DB")
             .build()
 
-        // ejecutar workers
-        workManager
-            .beginWith(listOf(workerPerfilRed, workerCargaRed, workerCalifRed))
-            .then(listOf(workerPerfilDb, workerCargaDb, workerCalifDb))
+        val workerCalifDb = OneTimeWorkRequestBuilder<SicenetCalificacionesDbWorker>()
+            .build()
+
+        // PERFIL
+        workManager.beginWith(workerPerfilRed)
+            .then(workerPerfilDb)
+            .enqueue()
+
+        // CARGA
+        workManager.beginWith(workerCargaRed)
+            .then(workerCargaDb)
+            .enqueue()
+
+        // CALIFICACIONES
+        workManager.beginWith(workerCalifRed)
+            .then(workerCalifDb)
             .enqueue()
     }
 }

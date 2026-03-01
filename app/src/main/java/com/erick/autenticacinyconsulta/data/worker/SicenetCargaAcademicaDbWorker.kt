@@ -7,6 +7,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.erick.autenticacinyconsulta.data.mapper.CargaAcademicaXmlParser
 import com.erick.autenticacinyconsulta.data.repository.LocalSNRepository
+import kotlinx.coroutines.flow.first
 
 class SicenetCargaAcademicaDbWorker(
     context: Context,
@@ -16,11 +17,18 @@ class SicenetCargaAcademicaDbWorker(
 
     override suspend fun doWork(): Result {
         return try {
-            val xml = inputData.getString("carga_xml") ?: return Result.failure()
 
-            Log.d("WM_CARGA_DB", "Procesando XML de carga académica")
+            val xml = inputData.getString("carga_xml")
+                ?: return Result.failure()
 
-            val perfil = localRepository.obtenerPerfil()
+            val matricula = inputData.getString("matricula")
+                ?: return Result.failure()
+
+            Log.d("WM_CARGA_DB", "Procesando XML de carga académica para $matricula")
+
+            val perfil = localRepository
+                .obtenerPerfil(matricula)
+                .first()
                 ?: return Result.failure()
 
             val lista = CargaAcademicaXmlParser.parse(
@@ -29,12 +37,15 @@ class SicenetCargaAcademicaDbWorker(
                 semestre = perfil.semActual
             )
 
-            // limpiar datos anteriores para evitar materias duplicadas
-            localRepository.guardarCargaAcademica(lista)
+            localRepository.guardarCargaAcademica(
+                matricula,
+                lista
+            )
 
-            Log.d("WM_CARGA_DB", "Carga académica actualizada correctamente (${lista.size} registros)")
+            Log.d("WM_CARGA_DB", "Carga académica actualizada (${lista.size})")
 
             Result.success()
+
         } catch (e: Exception) {
             Log.e("WM_CARGA_DB", "Error guardando carga académica", e)
             Result.failure()

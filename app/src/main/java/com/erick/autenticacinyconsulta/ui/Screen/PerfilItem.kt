@@ -1,4 +1,4 @@
-package com.erick.autenticacinyconsulta.ui.theme.Screen
+package com.erick.autenticacinyconsulta.ui.Screen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer

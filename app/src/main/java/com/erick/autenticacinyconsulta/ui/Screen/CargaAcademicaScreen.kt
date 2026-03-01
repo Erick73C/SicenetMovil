@@ -1,5 +1,6 @@
-package com.erick.autenticacinyconsulta.ui.theme.Screen
+package com.erick.autenticacinyconsulta.ui.Screen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,20 +21,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.erick.autenticacinyconsulta.ViewModel.CardexViewModel
-import com.erick.autenticacinyconsulta.ViewModel.CardexViewModelFactory
+import com.erick.autenticacinyconsulta.ViewModel.CargaAcademicaViewModel
+import com.erick.autenticacinyconsulta.ViewModel.CargaAcademicaViewModelFactory
 import com.erick.autenticacinyconsulta.data.repository.LocalSNRepository
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun CardexScreen(
+fun CargaAcademicaScreen(
     localRepository: LocalSNRepository
 ) {
     val context = LocalContext.current
 
-    val viewModel: CardexViewModel = viewModel<CardexViewModel>(
-        factory = CardexViewModelFactory(
+    val viewModel: CargaAcademicaViewModel = viewModel(
+        factory = CargaAcademicaViewModelFactory(
             localRepository = localRepository,
             context = context
         )
@@ -43,12 +44,16 @@ fun CardexScreen(
         viewModel.sincronizar()
     }
 
-    val cardex by viewModel.cardex.collectAsState()
+    val carga by viewModel.carga.collectAsState()
     val ultimaActualizacion by viewModel.ultimaActualizacion.collectAsState()
 
+    LaunchedEffect(carga) {
+        Log.d("UI_DEBUG", "Lista en UI: ${carga.size}")
+    }
+
     val greenPrimary = Color(0xFF2E7D32)
-    val greenLight  = Color(0xFF4CAF50)
-    val greenDark   = Color(0xFF1B5E20)
+    val greenLight   = Color(0xFF4CAF50)
+    val greenDark    = Color(0xFF1B5E20)
 
     Box(
         modifier = Modifier
@@ -56,8 +61,6 @@ fun CardexScreen(
             .background(Color(0xFFF1F8F1))
     ) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-
-            // ── Header con gradiente ─────────────────────────────────────
             item {
                 Box(
                     modifier = Modifier
@@ -70,10 +73,12 @@ fun CardexScreen(
                         )
                         .padding(top = 36.dp, bottom = 28.dp, start = 24.dp, end = 24.dp)
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxWidth()) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
                         Text(
-                            text = "📋 Kárdex Académico",
+                            text = "📚 Carga Académica",
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
                             color = Color.White,
@@ -90,32 +95,30 @@ fun CardexScreen(
                             )
                         }
 
-                        // Resumen rápido
-                        if (cardex.isNotEmpty()) {
+                        // Estadísticas
+                        if (carga.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(20.dp))
+                            val totalCreditos = carga.sumOf { it.creditos }
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
-                                val aprobadas = cardex.count {
-                                    it.acreditado.equals("si", ignoreCase = true) ||
-                                            it.acreditado.equals("sí", ignoreCase = true) ||
-                                            it.acreditado == "1"
-                                }
-                                val reprobadas = cardex.size - aprobadas
-                                StatChip("Total", "${cardex.size}", Color.White)
-                                StatChip("Aprobadas", "$aprobadas", Color(0xFFA5D6A7))
-                                StatChip("No aprobadas", "$reprobadas", Color(0xFFEF9A9A))
+                                CargaStatChip("Materias", "${carga.size}", Color.White)
+                                CargaStatChip("Créditos", "$totalCreditos", Color(0xFFA5D6A7))
+                                CargaStatChip(
+                                    "Semestre",
+                                    carga.firstOrNull()?.semestre?.toString() ?: "-",
+                                    Color(0xFFE3F2FD)
+                                )
                             }
                         }
                     }
                 }
             }
 
-            // ── Contenido ──────────────────────────────────────────────
             item { Spacer(modifier = Modifier.height(16.dp)) }
 
-            if (cardex.isEmpty()) {
+            if (carga.isEmpty()) {
                 item {
                     Box(
                         modifier = Modifier
@@ -130,7 +133,7 @@ fun CardexScreen(
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "Cargando kárdex...",
+                                text = "Cargando materias...",
                                 color = greenPrimary,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 16.sp
@@ -139,8 +142,8 @@ fun CardexScreen(
                     }
                 }
             } else {
-                items(cardex) { materia ->
-                    CardexItem(materia)
+                items(carga) { materia ->
+                    CargaAcademicaItem(materia)
                 }
                 item { Spacer(modifier = Modifier.height(16.dp)) }
             }
@@ -149,7 +152,7 @@ fun CardexScreen(
 }
 
 @Composable
-private fun StatChip(label: String, value: String, chipColor: Color) {
+private fun CargaStatChip(label: String, value: String, chipColor: Color) {
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = chipColor.copy(alpha = 0.25f)),

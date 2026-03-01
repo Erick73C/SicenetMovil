@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.erick.autenticacinyconsulta.SessionManager
 import com.erick.autenticacinyconsulta.data.repository.SNRepository
 
 class SicenetCargaAcademicaWorker(
@@ -16,6 +17,7 @@ class SicenetCargaAcademicaWorker(
 
     override suspend fun doWork(): Result {
         return try {
+
             Log.d("WM_CARGA_RED", "Consultando carga académica")
 
             val xml = repository.obtenerCargaAcademicaXml()
@@ -25,10 +27,15 @@ class SicenetCargaAcademicaWorker(
                 return Result.failure()
             }
 
+            val matricula = SessionManager.matricula
+
             Log.d("WM_CARGA_RED", "XML recibido correctamente")
 
             Result.success(
-                workDataOf("carga_xml" to xml)
+                workDataOf(
+                    "carga_xml" to xml,
+                    "matricula" to matricula
+                )
             )
 
         } catch (e: Exception) {

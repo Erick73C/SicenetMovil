@@ -3,6 +3,7 @@ package com.erick.autenticacinyconsulta.ViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
+import com.erick.autenticacinyconsulta.SessionManager
 import com.erick.autenticacinyconsulta.data.local.entity.CargaAcademicaEntity
 import com.erick.autenticacinyconsulta.data.repository.LocalSNRepository
 import com.erick.autenticacinyconsulta.data.sync.CargaAcademicaSyncManager
@@ -16,8 +17,10 @@ class CargaAcademicaViewModel(
     private val workManager: WorkManager
 ) : ViewModel() {
 
+    private val matricula = SessionManager.matricula
+
     val carga: StateFlow<List<CargaAcademicaEntity>> =
-        localRepository.obtenerCargaAcademica()
+        localRepository.obtenerCargaAcademica(matricula)
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
@@ -25,7 +28,7 @@ class CargaAcademicaViewModel(
             )
 
     val ultimaActualizacion: StateFlow<Long?> =
-        localRepository.obtenerUltimaActualizacionCargaFlow()
+        localRepository.obtenerUltimaActualizacionCargaFlow(matricula)
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),
@@ -36,4 +39,3 @@ class CargaAcademicaViewModel(
         CargaAcademicaSyncManager.sincronizar(workManager)
     }
 }
-

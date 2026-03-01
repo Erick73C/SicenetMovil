@@ -18,8 +18,9 @@ class SicenetPerfilDbWorker(
 
     override suspend fun doWork(): Result {
         return try {
+            Log.d("WM_PERFIL_DB", "Worker DB iniciado")
             val perfilJson = inputData.getString("perfil_json")
-
+            Log.d("WM_PERFIL_DB", "Worker DB iniciado")
             if (perfilJson.isNullOrEmpty()) {
                 Log.e("WM_PERFIL_DB", "No llegó perfil_json")
                 return Result.failure()
@@ -44,6 +45,7 @@ class SicenetPerfilDbWorker(
                 inscrito = perfil.inscrito,
                 ultimaActualizacion = System.currentTimeMillis()
             )
+            Log.d("WM_PERFIL_DB", "Guardando matrícula: '${entity.matricula}'")
 
             localRepository.guardarPerfil(entity)
 

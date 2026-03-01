@@ -1,4 +1,4 @@
-package com.erick.autenticacinyconsulta.ui.theme.Screen
+package com.erick.autenticacinyconsulta.ui.Screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

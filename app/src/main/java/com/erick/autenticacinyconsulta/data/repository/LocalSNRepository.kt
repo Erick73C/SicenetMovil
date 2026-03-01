@@ -18,21 +18,24 @@ class LocalSNRepository(
         perfilDao.insertarPerfil(perfil)
     }
 
-    suspend fun obtenerPerfil(): PerfilEntity? {
-        return perfilDao.obtenerPerfil()
+    fun obtenerPerfil(matricula: String): Flow<PerfilEntity?> {
+        return perfilDao.obtenerPerfil(matricula)
     }
 
-    suspend fun guardarCargaAcademica(carga: List<CargaAcademicaEntity>) {
-        cargaAcademicaDao.limpiar()
+    suspend fun guardarCargaAcademica(
+        matricula: String,
+        carga: List<CargaAcademicaEntity>
+    ) {
+        cargaAcademicaDao.limpiar(matricula)
         cargaAcademicaDao.insertarTodo(carga)
     }
 
-    fun obtenerCargaAcademica(): Flow<List<CargaAcademicaEntity>> {
-        return cargaAcademicaDao.obtenerCargaAcademica()
+    fun obtenerCargaAcademica(matricula: String): Flow<List<CargaAcademicaEntity>> {
+        return cargaAcademicaDao.obtenerCargaAcademica(matricula)
     }
 
-    fun obtenerUltimaActualizacionCargaFlow(): Flow<Long?> {
-        return cargaAcademicaDao.obtenerUltimaActualizacionFlow()
+    fun obtenerUltimaActualizacionCargaFlow(matricula: String): Flow<Long?> {
+        return cargaAcademicaDao.obtenerUltimaActualizacionFlow(matricula)
     }
 
     suspend fun guardarCardex(cardex: List<CardexEntity>) {

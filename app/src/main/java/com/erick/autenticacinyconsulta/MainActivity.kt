@@ -10,12 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import com.erick.autenticacinyconsulta.ui.navigation.AppScaffold
 import com.erick.autenticacinyconsulta.ui.navigation.Routes
 import com.erick.autenticacinyconsulta.ui.theme.AutenticaciónYConsultaTheme
-import com.erick.autenticacinyconsulta.ui.theme.Screen.CardexScreen
-import com.erick.autenticacinyconsulta.ui.theme.Screen.CargaAcademicaScreen
-import com.erick.autenticacinyconsulta.ui.theme.Screen.LoginScreen
-import com.erick.autenticacinyconsulta.ui.theme.Screen.PerfilScreen
-import com.erick.autenticacinyconsulta.ui.theme.Screen.CalificacionesScreen
-
+import com.erick.autenticacinyconsulta.ui.Screen.*
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,8 +43,12 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable(Routes.PERFIL) {
+
+                        //val matriculaUsuario =   // o donde la estés guardando
+
                         AppScaffold(navController) {
                             PerfilScreen(
+                                matricula = SessionManager.matricula,
                                 localRepository = appContainer.localSNRepository
                             )
                         }
