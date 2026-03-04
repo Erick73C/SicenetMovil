@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -28,13 +29,15 @@ class LoginViewModel(
     ) {
         viewModelScope.launch {
             try {
-                // intentar login online
                 val result = snRepository.acceso(usuario, password)
 
                 if (result.success) {
-                    val usuarioNormalizado = usuario.uppercase()
+
+                    val usuarioNormalizado = usuario.trim().uppercase()
                     SessionManager.iniciarSesion(usuarioNormalizado)
-                    encolarWorkersSincronizacion()
+
+                    encolarWorkerPerfil()
+
                     onSuccess()
                 } else {
                     onError("Credenciales inválidas")
@@ -44,18 +47,14 @@ class LoginViewModel(
 
                 val usuarioNormalizado = usuario.trim().uppercase()
 
-                Log.d("LOGIN_OFFLINE", "Buscando usuario: '$usuarioNormalizado'")
-
                 val perfilLocal = localRepository
                     .obtenerPerfil(usuarioNormalizado)
                     .first()
 
                 if (perfilLocal != null) {
 
-
                     SessionManager.iniciarSesion(usuarioNormalizado)
 
-                    Log.d("LOGIN_OFFLINE", "Perfil encontrado en Room")
                     onSuccess()
                 } else {
                     onError("Sin conexión y sin datos guardados")
@@ -64,8 +63,7 @@ class LoginViewModel(
         }
     }
 
-    // inicia la sincronización de toda la informacion del alumno en segundo plano
-    private fun encolarWorkersSincronizacion() {
+    private fun encolarWorkerPerfil() {
 
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -78,33 +76,16 @@ class LoginViewModel(
         val workerPerfilDb = OneTimeWorkRequestBuilder<SicenetPerfilDbWorker>()
             .build()
 
-        val workerCargaRed = OneTimeWorkRequestBuilder<SicenetCargaAcademicaWorker>()
-            .setConstraints(constraints)
-            .build()
-
-        val workerCargaDb = OneTimeWorkRequestBuilder<SicenetCargaAcademicaDbWorker>()
-            .build()
-
-        val workerCalifRed = OneTimeWorkRequestBuilder<SicenetCalificacionesWorker>()
-            .setConstraints(constraints)
-            .build()
-
-        val workerCalifDb = OneTimeWorkRequestBuilder<SicenetCalificacionesDbWorker>()
-            .build()
-
-        // PERFIL
-        workManager.beginWith(workerPerfilRed)
+        workManager
+            .beginUniqueWork(
+                "perfil_sync",
+                ExistingWorkPolicy.KEEP,
+                workerPerfilRed
+            )
+//            esto evita que:
+//                 Que se creen múltiples workers si el usuario intenta loguearse varias veces
+//                Que se duplique sincronización
             .then(workerPerfilDb)
-            .enqueue()
-
-        // CARGA
-        workManager.beginWith(workerCargaRed)
-            .then(workerCargaDb)
-            .enqueue()
-
-        // CALIFICACIONES
-        workManager.beginWith(workerCalifRed)
-            .then(workerCalifDb)
             .enqueue()
     }
 }

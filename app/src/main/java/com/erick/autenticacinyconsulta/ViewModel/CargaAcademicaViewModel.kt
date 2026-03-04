@@ -9,7 +9,9 @@ import com.erick.autenticacinyconsulta.data.repository.LocalSNRepository
 import com.erick.autenticacinyconsulta.data.sync.CargaAcademicaSyncManager
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 
 class CargaAcademicaViewModel(
@@ -34,8 +36,30 @@ class CargaAcademicaViewModel(
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue = null
             )
+//    Sincroniza solo si:
+//    No hay materias guardadas
+//    Nunca se sincronizó
+//    Pasó más de 1 hora
+    fun verificarYSincronizar() {
+        viewModelScope.launch {
 
-    fun sincronizar() {
+            val datos = carga.first()
+            val ultima = ultimaActualizacion.first()
+
+            val ahora = System.currentTimeMillis()
+
+            val necesitaSincronizar =
+                datos.isEmpty() ||
+                        ultima == null ||
+                        (ahora - ultima) > 1000 * 60 * 60 // 1 hora para recargar los datos y sincronizarlos de nuevo
+
+            if (necesitaSincronizar) {
+                sincronizar()
+            }
+        }
+    }
+
+    private fun sincronizar() {
         CargaAcademicaSyncManager.sincronizar(workManager)
     }
 }

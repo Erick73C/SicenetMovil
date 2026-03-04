@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,11 +42,20 @@ import com.erick.autenticacinyconsulta.data.repository.SNRepository
 fun PerfilScreen(
     matricula: String,
     localRepository: LocalSNRepository,
-    viewModel: PerfilViewModel = viewModel(
-        factory = PerfilViewModelFactory(localRepository)
-    )
 ) {
-    Log.d("PERFIL_UI", "Matricula recibida = $matricula")
+    val context = LocalContext.current
+
+    val viewModel: PerfilViewModel = viewModel(
+        factory = PerfilViewModelFactory(
+            localRepository = localRepository,
+            context = context
+        )
+    )
+
+    LaunchedEffect(matricula) {
+        viewModel.verificarYSincronizarPerfil(matricula.uppercase())
+    }
+
     val perfilFlow = remember(matricula) {
         viewModel.obtenerPerfil(matricula.uppercase())
     }
@@ -62,7 +72,7 @@ fun PerfilScreen(
         }
 
     } else {
-        Log.d("PERFIL_UI", "Perfil encontrado = ${perfil?.matricula}")
+
         val p = perfil!!
 
         // Colores verde personalizados (mismos que LoginScreen)

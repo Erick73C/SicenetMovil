@@ -40,7 +40,7 @@ fun CardexScreen(
     )
 
     LaunchedEffect(Unit) {
-        viewModel.sincronizar()
+        viewModel.verificarYSincronizar()
     }
 
     val cardex by viewModel.cardex.collectAsState()

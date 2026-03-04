@@ -41,7 +41,7 @@ fun CargaAcademicaScreen(
     )
 
     LaunchedEffect(Unit) {
-        viewModel.sincronizar()
+        viewModel.verificarYSincronizar()
     }
 
     val carga by viewModel.carga.collectAsState()
