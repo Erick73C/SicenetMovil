@@ -21,6 +21,12 @@
             android:exported="false"
             tools:node="remove" />
 
+        <provider
+            android:name=".provider.SicenetProvider"
+            android:authorities="com.example.sicenet.provider"
+            android:exported="true"
+            />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
